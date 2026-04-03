@@ -215,7 +215,7 @@ The following table can be used to report quantitative performance on standard u
 
 | Model | Dataset | PSNR ↑ | SSIM ↑ | LPIPS ↓ | Notes |
 |------|---------|--------|--------|---------|------|
-| AquaFastNet | UIEB | 25.15 | 0.91 | 0.152 | Best current model |
+| AquaFastNet | UIEB | 25.27 | 0.91 | 0.152 | Best current model |
 | AquaFastNet | EUVP Test | 24.32 | 0.89 | 0.168 | Bench evaluation |
 | AquaFastNet (Base32) | Validation Set | 24.87 | 0.90 | 0.160 | EMA checkpoint |
 | AquaFastNet (Base32, BenchEUVP) | EUVP Test | 24.56 | 0.90 | 0.157 | Fine-tuned |
