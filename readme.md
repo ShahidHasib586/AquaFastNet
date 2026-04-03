@@ -67,7 +67,7 @@ AquaFastNet/
 │   ├── data.py
 │   ├── losses.py
 │   ├── models.py
-│   └── models1.py
+│   └── edge_osa_models.py
 └── runs/
     ├── uie_fastunet_base32/
     │   ├── best.pt
