@@ -1,3 +1,14 @@
+# Copyright 2026 Shahid Ahamed Hasib
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #!/usr/bin/env python3
 import argparse
 from pathlib import Path
@@ -12,9 +23,9 @@ import torch.nn.functional as F
 from uie.models import FastUNetEnhancer
 
 
-# ----------------------------
+
 # Utils
-# ----------------------------
+
 def parse_hw(s: str):
     s = (s or "").strip().lower()
     if not s:
@@ -56,9 +67,8 @@ def pad_to_multiple(x: torch.Tensor, m: int = 8):
     return x, (pad_h, pad_w)
 
 
-# ----------------------------
-# Post-processing (optional)
-# ----------------------------
+
+# Post-processing 
 def gray_world_white_balance_rgb(rgb_u8: np.ndarray) -> np.ndarray:
     img = rgb_u8.astype(np.float32)
     mean = img.reshape(-1, 3).mean(axis=0) + 1e-6
@@ -109,9 +119,8 @@ def postprocess_bgr(bgr: np.ndarray, do_wb: bool, do_clahe: bool, clahe_clip: fl
     return cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
 
 
-# ----------------------------
 # Tiled inference (anti-seam)
-# ----------------------------
+
 @torch.no_grad()
 def enhance_tiled(model, x: torch.Tensor, tile: int, overlap: int, multiple: int = 8,
                   use_amp: bool = True, offset_y: int = 0, offset_x: int = 0) -> torch.Tensor:
