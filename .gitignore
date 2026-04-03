@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# PyTorch / training artifacts
+
+
+# Logs
+*.log
+logs/
+outputs/
+results/
+tmp/
+temp/
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
+
+# Data
+
+manifests/train_pairs.csv
+manifests/val_pairs.csv
+
+# Cache
+.cache/
+# SLURM logs
+slurm*.out
+*.out
+
+# Packaging artifacts
+*.egg-info/
+build/
+dist/
+
+# Python cache
+__pycache__/
+.ipynb_checkpoints/
