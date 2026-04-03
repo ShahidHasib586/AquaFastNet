@@ -2,7 +2,7 @@
 
 **AquaFastNet: Underwater Vision Enhancement for Robotics**
 
-AquaFastNet is a lightweight deep learning framework for underwater image enhancement, designed for robotic perception, embedded deployment, and reproducible experimentation. The project focuses on fast inference, stable training, and practical evaluation on paired underwater image datasets.
+AquaFastNet is a deep learning framework for underwater image enhancement, designed for robotic perception, embedded deployment, and reproducible experimentation. The project focuses on fast inference, stable training, and practical evaluation on paired underwater image datasets.
 
 ---
 
@@ -37,7 +37,6 @@ AquaFastNet/
 ├── README.md
 ├── pyproject.toml
 ├── requirements.txt
-├── requirements_locked.txt
 ├── train.py
 ├── live_video.py
 ├── compare_visuals.py
@@ -76,3 +75,400 @@ AquaFastNet/
     └── uie_fastunet_base32_benchEUVP/
         ├── best.pt
         └── last.pt
+```
+## 🧠 Model Summary
+
+AquaFastNet uses a compact encoder-decoder design for underwater image enhancement.
+
+### 🔧 Architecture Highlights
+
+- The encoder progressively extracts multiscale features  
+- Each block uses **depthwise separable convolution** for efficiency  
+- **Squeeze-and-Excitation (SE)** modules refine channel importance  
+- The decoder reconstructs enhanced features through **skip-connected upsampling**  
+- A **residual output formulation** helps preserve scene content  
+
+### 🎯 Core Design Goals
+
+- Real-time or near-real-time capability  
+- Good visual restoration quality  
+- Compatibility with robotics workflows  
+- Simplicity for reproducible training and deployment  
+
+---
+
+## 📉 Loss Function
+
+Training uses a mixed objective composed of:
+
+- **L1 loss** for pixel-level fidelity  
+- **SSIM loss** for structural consistency  
+- **VGG perceptual loss** for high-level visual quality  
+
+This combination helps the model balance restoration accuracy with perceptual improvement.
+
+---
+## 🏗 Architecture Diagram
+
+AquaFastNet follows a compact encoder-decoder design with lightweight convolutional blocks, channel attention, and residual enhancement output.
+
+```text
+Input RGB Image
+   (B, 3, H, W)
+        │
+        ▼
+┌─────────────────────────────┐
+│ Encoder Block e0            │
+│ Block(3 → b)                │
+│ DWConv + DWConv + SE        │
+└─────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────┐
+│ Encoder Block e1            │
+│ Block(b → 2b, down=True)    │
+│ DWConv + DWConv + SE        │
+└─────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────┐
+│ Encoder Block e2            │
+│ Block(2b → 4b, down=True)   │
+│ DWConv + DWConv + SE        │
+└─────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────┐
+│ Encoder Block e3            │
+│ Block(4b → 6b, down=True)   │
+│ DWConv + DWConv + SE        │
+└─────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────┐
+│ Bottleneck                  │
+│ Block(6b → 6b)              │
+│ DWConv + DWConv + SE        │
+└─────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────┐
+│ Decoder Block u2            │
+│ Upsample + Skip Fusion      │
+│ UpBlock(6b + 6b → 4b)       │
+└─────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────┐
+│ Decoder Block u1            │
+│ Upsample + Skip Fusion      │
+│ UpBlock(4b + 4b → 2b)       │
+└─────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────┐
+│ Decoder Block u0            │
+│ Upsample + Skip Fusion      │
+│ UpBlock(2b + 2b → b)        │
+└─────────────────────────────┘
+        │
+        ▼
+Final Upsample to Original Resolution
+        │
+        ▼
+   1×1 Conv Head
+        │
+        ▼
+ Sigmoid Output
+        │
+        ▼
+Residual Enhancement:
+output = clamp(pred + 0.10 × input, 0, 1)
+        │
+        ▼
+Enhanced RGB Image
+   (B, 3, H, W)
+```
+### 🧩 Block Definition
+
+Each main block in AquaFastNet contains:
+
+- **Depthwise separable convolution**  
+- **Batch normalization**  
+- **SiLU activation**  
+- **Squeeze-and-Excitation (SE) attention**  
+
+---
+
+### 🧠 Design Rationale
+
+- **Depthwise separable convolutions** reduce computation and parameter count  
+- **SE attention** improves channel-wise feature calibration  
+- **Skip connections** preserve spatial details during reconstruction  
+- **Residual output formulation** helps retain original scene structure while enhancing degraded regions
+
+## 📊 Benchmark Results
+
+The following table can be used to report quantitative performance on standard underwater image enhancement benchmarks.
+
+> Replace the example values below with your actual results.
+
+| Model | Dataset | PSNR ↑ | SSIM ↑ | LPIPS ↓ | Notes |
+|------|---------|--------|--------|---------|------|
+| AquaFastNet | UIEB | 25.15 | 0.91 | 0.152 | Best current model |
+| AquaFastNet | EUVP Test | 24.32 | 0.89 | 0.168 | Bench evaluation |
+| AquaFastNet (Base32) | Validation Set | 24.87 | 0.90 | 0.160 | EMA checkpoint |
+| AquaFastNet (Base32, BenchEUVP) | EUVP Test | 24.56 | 0.90 | 0.157 | Fine-tuned |
+
+### Metric Definitions
+
+- **PSNR**: Peak Signal-to-Noise Ratio. Higher is better.
+- **SSIM**: Structural Similarity Index. Higher is better.
+- **LPIPS**: Learned Perceptual Image Patch Similarity. Lower is better.
+
+### Notes
+
+- Results should be computed on the same test split for fair comparison.
+- When reporting final values, use the checkpoint corresponding to the best validation or benchmark performance.
+- If EMA is enabled during training, report whether evaluation uses the EMA weights.
+
+## 🔁 Reproducibility Status
+
+- ✔ Code available  
+- ✔ Training pipeline available  
+- ✔ Evaluation scripts available  
+- ✔ Inference scripts available  
+- ✔ Example checkpoints included  
+- ✔ Dataset files referenced via CSV manifests  
+- ⚠ Raw datasets are not redistributed in this repository  
+
+---
+
+## ⚙️ Environment Setup
+
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements_locked.txt
+
+```
+
+---
+## Requirements
+
+This project was developed in a Python virtual environment. The following files are provided:
+
+- `requirements.txt` → practical installation
+- `requirements_locked.txt` → exact environment reproduction
+
+For best reproducibility, use:
+
+```bash
+pip install -r requirements_locked.txt
+```
+
+## 📂 Dataset Format
+
+Training and evaluation use paired CSV manifests with the following format:
+
+```csv
+input,gt
+/path/to/input_001.png,/path/to/gt_001.png
+/path/to/input_002.png,/path/to/gt_002.png
+
+```
+## 📄 Included Manifest Files
+
+The following CSV files define dataset splits and are used for training, validation, and evaluation:
+
+- `manifests/train_pairs_train.csv` – Training split (paired input and ground truth)
+- `manifests/train_pairs_val.csv` – Validation split
+- `manifests/test_pairs.csv` – Test dataset for evaluation
+- `manifests/uieb_pairs.csv` – UIEB dataset pairs
+- `manifests/euvp_paired_train.csv` – EUVP paired training set
+- `manifests/bench_euvp_test515.csv` – EUVP benchmark test set (515 samples)
+- `manifests/teacher_pseudo_pairs.csv` – Pseudo-labeled dataset generated by teacher model
+
+---
+
+## ⚠️ Important Note
+
+If you move the dataset to a different machine, you may need to update the file paths inside the CSV files to match your local directory structure.
+
+---
+
+## 🚀 Training
+
+### ▶️ Standard Training Command
+
+```bash
+python train.py \
+  --train_csv manifests/train_pairs_train.csv \
+  --val_csv manifests/train_pairs_val.csv \
+  --out runs/aquafastnet \
+  --epochs 40 \
+  --batch 8 \
+  --crop 256 \
+  --lr 2e-4 \
+  --base 32 \
+  --num_workers 4 \
+  --accum 1 \
+  --ema_decay 0.999
+
+```
+### 🔁 Resume Training
+```bash
+python train.py \
+  --train_csv manifests/train_pairs_train.csv \
+  --val_csv manifests/train_pairs_val.csv \
+  --out runs/aquafastnet \
+  --epochs 100 \
+  --batch 8 \
+  --crop 256 \
+  --lr 2e-4 \
+  --base 32 \
+  --resume runs/aquafastnet/last.pt
+
+```
+## ⚙️ Main Training Arguments
+
+The following arguments control the training process of AquaFastNet:
+
+| Argument        | Description                                      |
+|----------------|--------------------------------------------------|
+| `--train_csv`   | Training dataset CSV manifest                    |
+| `--val_csv`     | Validation dataset CSV manifest                  |
+| `--out`         | Output directory for checkpoints                 |
+| `--epochs`      | Number of training epochs                        |
+| `--batch`       | Batch size                                       |
+| `--crop`        | Input patch size                                 |
+| `--lr`          | Learning rate                                    |
+| `--base`        | Base number of channels in the model             |
+| `--num_workers` | Number of dataloader workers                     |
+| `--accum`       | Gradient accumulation steps                      |
+| `--ema_decay`   | Exponential Moving Average factor                |
+| `--resume`      | Path to checkpoint for resuming training         |
+
+### Evaluation
+```bash
+#Basic evaluation
+python eval_metrics.py \
+  --model runs/uie_fastunet_base32/best.pt \
+  --csv manifests/test_pairs.csv
+```
+```bash
+#Full evaluation
+python eval_all_metrics.py
+Benchmark evaluation
+python scripts/eval_benchmark.py
+Validation-like-train script
+python scripts/validate_like_train.py
+```
+### Inference
+```bash
+#Run inference on a folder
+python scripts/infer_folder.py \
+  --model runs/uie_fastunet_base32/best.pt \
+  --input_dir path/to/input_images \
+  --output_dir path/to/output_images
+```
+```bash
+Run inference on video
+python scripts/enhance_video.py \
+  --model runs/uie_fastunet_base32/best.pt \
+  --input input.mp4 \
+  --output output.mp4
+```
+```bash
+# Live video inference
+python live_video.py
+```bash
+# Compare visual outputs
+python compare_visuals.py
+```
+```bash
+#Side-by-side comparison
+python scripts/compare_side_by_side.py
+```
+### 📦 Pretrained Checkpoints
+
+This repository includes example trained checkpoints located in:
+
+```text
+runs/uie_fastunet_base32/
+runs/uie_fastunet_base32_benchEUVP/
+
+```
+### 🔁 Reproducing the Main Workflow
+
+A practical reproduction path is:
+
+1. Create and activate a virtual environment  
+2. Install dependencies from `requirements.txt`  
+3. Verify dataset paths inside the manifest CSV files  
+4. Train using `train.py`  
+5. Evaluate using `eval_metrics.py` or `eval_all_metrics.py`  
+6. Run inference using `scripts/infer_folder.py` or `scripts/enhance_video.py`  
+7. Compare outputs visually and quantitatively  
+
+---
+
+### 🧪 Recommended Reproduction Recipe
+
+```bash
+source .venv/bin/activate
+
+python train.py \
+  --train_csv manifests/train_pairs_train.csv \
+  --val_csv manifests/train_pairs_val.csv \
+  --out runs/aquafastnet_repro \
+  --epochs 100 \
+  --batch 8 \
+  --crop 256 \
+  --lr 2e-4 \
+  --base 32 \
+  --num_workers 4 \
+  --accum 1 \
+  --ema_decay 0.999
+
+python eval_metrics.py \
+  --model runs/aquafastnet_repro/best.pt \
+  --csv manifests/test_pairs.csv
+```
+### 🌊 Applications
+
+AquaFastNet is relevant to:
+
+- Underwater robotics  
+- Marine inspection  
+- Autonomous underwater vehicles (AUVs)  
+- Remotely operated vehicles (ROVs)  
+- Preprocessing for object detection  
+- Preprocessing for SLAM and 3D reconstruction  
+- Embedded and edge-oriented vision pipelines  
+
+---
+
+### ⚠️ Limitations
+
+- Dataset images are not included in the repository  
+- CSV manifests may contain machine-specific paths  
+- Performance depends on dataset quality and training setup  
+- Deployment performance on embedded systems depends on model export format and hardware configuration  
+
+---
+
+### 🚀 Future Work
+
+Potential future extensions include:
+
+- Embedded deployment benchmarking  
+- ROS 2 integration  
+- Real-time camera-topic enhancement  
+- Multi-camera fusion  
+- Downstream evaluation for detection and 3D reconstruction  
+- Comparison with other lightweight underwater enhancement models
+
+                                                                        
