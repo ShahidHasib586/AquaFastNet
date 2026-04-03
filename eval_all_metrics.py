@@ -1,3 +1,14 @@
+# Copyright 2026 Shahid Ahamed Hasib
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #!/usr/bin/env python3
 import argparse, csv, math
 from pathlib import Path
@@ -15,9 +26,7 @@ import lpips
 from uie.models import FastUNetEnhancer
 from uie.data import PairDataset
 
-# ---------------------------
 # Helpers
-# ---------------------------
 def tensor_to_np(t):
     x = t.squeeze(0).detach().cpu().numpy().transpose(1, 2, 0)
     return np.clip(x, 0.0, 1.0).astype(np.float32)
@@ -26,9 +35,8 @@ def to_gray_uint8(rgb01):
     gray = cv2.cvtColor((rgb01 * 255).astype(np.uint8), cv2.COLOR_RGB2GRAY)
     return gray
 
-# ---------------------------
 # MS-SSIM
-# ---------------------------
+
 def _ssim_single(x, y, data_range=1.0, win=11):
     return structural_similarity(x, y, channel_axis=-1, data_range=data_range)
 
@@ -50,11 +58,11 @@ def ms_ssim_np(x, y, levels=5):
         score *= float(max(s, 1e-6)) ** w
     return float(score)
 
-# ---------------------------
+
 # NIQE
 # Simple fallback implementation based on skimage if available;
 # otherwise returns NaN.
-# ---------------------------
+
 try:
     from skimage.metrics import normalized_root_mse  # dummy import to test skimage
     from skimage import metrics as skm
@@ -72,9 +80,9 @@ def niqe_fallback(rgb01):
     except Exception:
         return float("nan")
 
-# ---------------------------
+
 # UIQM
-# ---------------------------
+
 def _uicm(img):
     R = img[:, :, 0].astype(np.float32)
     G = img[:, :, 1].astype(np.float32)
@@ -147,9 +155,8 @@ def uiqm(img):
     c1, c2, c3 = 0.0282, 0.2953, 3.5753
     return c1 * _uicm(img) + c2 * _uism(img) + c3 * _uiconm(img)
 
-# ---------------------------
 # UCIQE
-# ---------------------------
+
 def uciqe(img):
     # img in [0,1], RGB
     lab = rgb2lab(img_as_float32(img))
@@ -167,9 +174,9 @@ def uciqe(img):
 
     return float(0.4680 * sigma_c + 0.2745 * con_l + 0.2576 * mu_s)
 
-# ---------------------------
+
 # Main
-# ---------------------------
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pairs_csv", required=True)
