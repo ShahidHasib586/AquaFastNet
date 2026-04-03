@@ -384,6 +384,7 @@ python scripts/enhance_video.py \
 ```bash
 # Live video inference
 python live_video.py
+```
 ```bash
 # Compare visual outputs
 python compare_visuals.py
