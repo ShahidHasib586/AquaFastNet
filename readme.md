@@ -23,6 +23,78 @@ The first row contains the raw underwater inputs, and the second row shows the c
   <img src="https://github.com/ShahidHasib586/AquaFastNet/blob/main/outputs/all_results_2rows.png?raw=true" alt="AquaFastNet qualitative results" width="100%">
 </p>
 
+
+
+## 🚀 Test on Custom Images
+
+AquaFastNet can be tested quickly on your own custom underwater images using the provided `test_custom_data.py` script.
+
+This script:
+
+- loads a trained checkpoint
+- processes all images in an input folder
+- saves the original raw images
+- saves the corresponding model outputs
+- generates a single `all_results_2rows.png` file showing:
+  - top row: raw inputs
+  - bottom row: AquaFastNet outputs
+
+---
+
+### 1. Prepare your files
+
+Place your model checkpoint and custom test images in accessible locations.
+
+Example structure:
+
+```text
+AquaFastNet/
+├── best.pt
+├── images/
+│   ├── img1.jpg
+│   ├── img2.jpg
+│   └── img3.png
+└── test_custom_data.py
+```
+
+### 2. Update paths in test_custom_data.py
+```text
+Edit these variables inside the script:
+
+ckpt_path = "/content/best.pt"
+inp_dir   = "/content/images"
+out_dir   = "/content/enhanced_outputs_raw_model_only"
+
+Set them to match your checkpoint path, input image folder, and desired output folder.
+```
+### 3. Run the script
+python test_custom_data.py
+
+If you are using Google Colab, you can run the script directly in a notebook cell.
+
+### 4. Output files
+```text
+For each input image, the script saves:
+
+*_raw.png — original input image
+*_model.png — AquaFastNet output
+
+It also saves:
+
+all_results_2rows.png — a single qualitative comparison image containing all results
+```
+### 5. Example output layout
+
+```text
+The combined output image is organized as:
+
+RAW IMAGE 1      RAW IMAGE 2      RAW IMAGE 3      ...
+MODEL OUTPUT 1   MODEL OUTPUT 2   MODEL OUTPUT 3   ...
+
+This makes it easy to visually compare the model outputs against the corresponding raw inputs.
+```
+
+
 ## Key Features
 
 - Lightweight U-Net style architecture
