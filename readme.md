@@ -553,4 +553,11 @@ Potential future extensions include:
 - Downstream evaluation for detection and 3D reconstruction  
 - Comparison with other lightweight underwater enhancement models
 
-                                                                        
+
+## License
+
+This project is licensed under the Apache License 2.0.
+
+Copyright (c) 2026 Shahid Ahamed Hasib
+
+See the LICENSE file for details.
