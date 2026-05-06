@@ -14,6 +14,14 @@ This repository contains the model, training pipeline, evaluation scripts, infer
 
 ---
 
+## Model Architecture
+
+<p align="center">
+  <img src="Resources/Aquafastnet.png" alt="AquaFastNET Architecture" width="800">
+</p>
+
+<p align="center"><b>AquaFastNET Architecture</b></p>
+
 ## Qualitative Results
 
 The figure below shows example qualitative results produced by AquaFastNet.  
