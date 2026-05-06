@@ -300,7 +300,6 @@ Each main block in AquaFastNet contains:
 
 The following table can be used to report quantitative performance on standard underwater image enhancement benchmarks.
 
-> Replace the example values below with your actual results.
 
 | Model | Dataset | PSNR ↑ | SSIM ↑ | LPIPS ↓ | Notes |
 |------|---------|--------|--------|---------|------|
