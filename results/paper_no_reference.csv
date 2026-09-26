@@ -1,0 +1,9 @@
+model,dataset,uiqm,uciqe,niqe,brisque,piqe,source_table
+AquaFastNet,UIEB-C60,2.99,0.25,,,,XIII
+AquaFastNet,EUVP-T515,3.29,0.28,,,,XIII
+AquaFastNet,SQUID-T16,2.31,0.21,,,,XIII
+AquaFastNet,RUIE-T78,2.73,0.21,,,,XIII
+AquaFastNet,UIEB,,,5.56,39.97,57.47,XIV
+AquaFastNet,EUVP,,,5.88,35.54,44.38,XIV
+AquaFastNet,SQUID,,,8.92,53.70,54.16,XIV
+AquaFastNet,RUIE,,,5.71,36.90,51.77,XIV

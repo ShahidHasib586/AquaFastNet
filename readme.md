@@ -29,7 +29,7 @@ The released base-32 implementation has **309,862 trainable parameters**, while 
 | UIEB test subset | L2/MSE | 25.22 | 0.95 | — | 0.15 | — |
 | EUVP Test | L2/MSE | 25.19 | 0.91 | — | 0.18 | — |
 
-See Tables V and XXII; validation and test rows must remain distinct.
+Source: Table V (rounded values). The ablation table below preserves the higher precision reported in the architecture-specific table. Validation and test rows must remain distinct.
 
 ## Paper-reported runtime
 
@@ -43,6 +43,42 @@ RTX 3070, 228 images, saving disabled; Tables XV–XIX.
 | Batch model-only | 4.97 | 201.07 |
 | Batch standard pipeline | 29.30 | 34.12 |
 | Batch optimized pipeline | 12.11 | 82.53 |
+
+## Paper-reported component ablations
+
+Source: Table XXIII. These are manuscript results; the repository does not bundle every ablation checkpoint.
+
+| Variant | PSNR ↑ | SSIM ↑ | LPIPS ↓ | Optimized FPS ↑ | Paper parameters |
+| --- | --- | --- | --- | --- | --- |
+| Without SE | 18.40 | 0.8686 | 0.2528 | 223.96 | 96414 |
+| Without skips | 20.97 | 0.9009 | 0.2282 | 230.90 | 101686 |
+| Without input residual | 21.10 | 0.9093 | 0.1995 | 199.68 | 107670 |
+| Reduced channels | 20.11 | 0.8904 | 0.2194 | 344.04 | 30046 |
+| Standard convolution | 22.80 | 0.9376 | 0.1655 | 188.24 | 779707 |
+| Full composite | 25.27 | 0.9467 | 0.1520 | 39.30 | 107670 |
+| Full MSE | 25.22 | 0.9456 | 0.1530 | 39.30 | 107670 |
+
+Paper parameter counts are transcribed unchanged; they differ from the released implementation, as documented above.
+
+## Paper-reported no-reference quality
+
+Table XIII uses locally prepared subsets and a specific UIQM/UCIQE implementation. These scores must not be mixed with the internal scales in Table V.
+
+| Subset | UIQM ↑ | UCIQE ↑ |
+| --- | --- | --- |
+| UIEB-C60 | 2.99 | 0.25 |
+| EUVP-T515 | 3.29 | 0.28 |
+| SQUID-T16 | 2.31 | 0.21 |
+| RUIE-T78 | 2.73 | 0.21 |
+
+Table XIV reports a separate general perceptual evaluation; its dataset labels and NIQE values are kept separate from the paired evaluation above.
+
+| Dataset | NIQE ↓ | BRISQUE ↓ | PIQE ↓ |
+| --- | --- | --- | --- |
+| UIEB | 5.56 | 39.97 | 57.47 |
+| EUVP | 5.88 | 35.54 | 44.38 |
+| SQUID | 8.92 | 53.70 | 54.16 |
+| RUIE | 5.71 | 36.90 | 51.77 |
 
 ## Setup and usage
 
@@ -78,6 +114,10 @@ python -m scripts.eval_benchmark --csv manifests/test_pairs.csv \
 ```
 
 This utility reports PSNR; `eval_metrics.py` and `eval_all_metrics.py` offer additional legacy metrics with their own fixed crops and implementations. The latter's NIQE fallback is a proxy, not a canonical NIQE result. See [metric caveats](docs/PAPER.md). Bundled checkpoints also exist under `runs/uie_fastunet_base32_benchEUVP/`; checkpoint validation metadata must not be mistaken for a held-out test result.
+
+## Repository contents
+
+Training, inference, metric evaluation, original split manifests (where available), unique checkpoints, configuration examples, tests and paper-result CSVs are retained. Architecture figures and one compact qualitative preview (where available) support inspection. See [cleanup and checkpoint notes](docs/CLEANUP.md) for removed files and recovery information.
 
 ## Interpretation and limitations
 
