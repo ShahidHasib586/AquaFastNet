@@ -1,0 +1,8 @@
+variant,psnr_db,ssim,lpips,optimized_fps,reported_parameters,source_table
+Without SE,18.40,0.8686,0.2528,223.96,96414,XXIII
+Without skips,20.97,0.9009,0.2282,230.90,101686,XXIII
+Without input residual,21.10,0.9093,0.1995,199.68,107670,XXIII
+Reduced channels,20.11,0.8904,0.2194,344.04,30046,XXIII
+Standard convolution,22.80,0.9376,0.1655,188.24,779707,XXIII
+Full composite,25.27,0.9467,0.1520,39.30,107670,XXIII
+Full MSE,25.22,0.9456,0.1530,39.30,107670,XXIII

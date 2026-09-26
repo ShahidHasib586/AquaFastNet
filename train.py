@@ -82,6 +82,7 @@ def main():
     ap.add_argument("--accum", type=int, default=1)
     ap.add_argument("--ema_decay", type=float, default=0.999)
     ap.add_argument("--resume", default="")
+    ap.add_argument("--loss", choices=["composite", "l1", "mse"], default="composite")
     args = ap.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -99,7 +100,7 @@ def main():
     val_ld = DataLoader(val_ds, batch_size=1, shuffle=False, num_workers=1)
 
     model = FastUNetEnhancer(base=args.base).to(device)
-    loss_fn = ComboLoss().to(device)
+    loss_fn = ComboLoss(objective=args.loss).to(device)
 
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
     sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=args.epochs)
@@ -110,6 +111,10 @@ def main():
     start_ep = 0
     best = -1.0
     if args.resume and Path(args.resume).exists():
+        resume_meta = torch.load(args.resume, map_location="cpu", weights_only=True)
+        previous_loss = resume_meta.get("args", {}).get("loss", "composite")
+        if previous_loss != args.loss:
+            raise ValueError("Resume objective differs; use a separate fresh run for a loss ablation.")
         start_ep, best = load_ckpt(args.resume, model, ema, opt, sch, scaler, device)
         print(f"[RESUME] epoch={start_ep} best={best:.3f}")
 

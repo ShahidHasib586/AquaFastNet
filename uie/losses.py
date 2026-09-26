@@ -31,15 +31,21 @@ class VGGPerceptual(nn.Module):
         return F.l1_loss(fx, fy)
 
 class ComboLoss(nn.Module):
-    def __init__(self, w_l1=1.0, w_ssim=0.2, w_perc=0.05):
+    def __init__(self, w_l1=1.0, w_ssim=0.2, w_perc=0.05, objective="composite"):
         super().__init__()
+        if objective not in {"composite", "l1", "mse"}:
+            raise ValueError("objective must be composite, l1, or mse")
+        self.objective = objective
         self.w_l1 = w_l1
         self.w_ssim = w_ssim
         self.w_perc = w_perc
-        self.perc = VGGPerceptual()
+        self.perc = VGGPerceptual() if objective == "composite" and w_perc else None
     def forward(self, pred, gt):
         l1 = F.l1_loss(pred, gt)
+        if self.objective in {"l1", "mse"}:
+            total = l1 if self.objective == "l1" else F.mse_loss(pred, gt)
+            return total, {"l1": l1.item(), "ssim": 0.0, "perc": 0.0}
         ls = ssim_loss(pred, gt)
-        lp = self.perc(pred, gt)
+        lp = self.perc(pred, gt) if self.perc is not None else pred.new_tensor(0.0)
         total = self.w_l1*l1 + self.w_ssim*ls + self.w_perc*lp
         return total, {"l1": l1.item(), "ssim": ls.item(), "perc": lp.item()}
